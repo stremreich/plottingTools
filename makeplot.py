@@ -65,7 +65,7 @@ def add_lumi():
     lumi.SetTextColor(    1 )
     lumi.SetTextSize(0.06)
     lumi.SetTextFont (   42 )
-    lumi.AddText("e#tau_{h}   2017, 41.52 fb^{-1} (13 TeV)")
+    lumi.AddText("2017, 41.52 fb^{-1} (13 TeV)")
     return lumi
 
 def add_CMS():
@@ -128,8 +128,8 @@ if firstarg=="Cutflow":
 print (dirName+histoname)
 for i in range (0,ncat):
     WZ = OutFile.Get(dirName+"WZ_"+histoname)
-  #HistoData=OutFile.Get(dirName[0]+"data_obs_"+histoname)
-    HistoData=WZ.Clone()
+    HistoData=OutFile.Get(dirName+"data_obs_"+histoname)
+    #HistoData=WZ.Clone()
 #    HistoData=OutFile.Get(dirName[0]+"dataset_1_"+histoname)
 #    HistoData=OutFile.Get(dirName[0]+"dataset_2_"+histoname)
 #    HistoData=OutFile.Get(dirName[0]+"dataset_3_"+histoname)
@@ -336,7 +336,7 @@ HistoData.Draw("e1same")
 #errorBand.Draw("e2same")
 
 legend=make_legend()
-#legend.AddEntry(HistoData,"Data","elp")
+legend.AddEntry(HistoData,"Data","elp")
 #legende.AddEntry(HistoData,"Data runB","elp")
 #legende.AddEntry(HistoData,"Data runC","elp")
 #legende.AddEntry(HistoData,"Data runD","elp")

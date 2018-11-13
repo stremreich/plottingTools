@@ -21,7 +21,11 @@ outfile=ROOT.TFile(outputname, "RECREATE")
 drawBranches = ["Energy",
                 "Eta",
                 "Phi",
-                "Pt"]
+                "Pt",
+		"Mass",
+		"etajj",
+		"mjj",
+		"nJets"]
 
 for chan in ["eee", "eem", "emm", "mmm"]:
     drawTree = infile.Get(chan+"/ntuple")

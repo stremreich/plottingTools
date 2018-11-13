@@ -9,7 +9,11 @@
 #monoHiggs/MC_sf/MC_2017
 #################### MC ###############################
 
-./postAnalyzer.exe histfile.root files_initial/WZTo3LNu.root WZTo3LNu WZ 0
+./postAnalyzer.exe /data/strembat/WZ2017/MC/WZTo3LNu_0Jets_histfile.root files_initial/WZTo3LNu_0Jets.root WZTo3LNu_0Jets WZ 0
+
+#################### Data #############################
+
+./postAnalyzer.exe /data/strembat/WZ2017/data/2017B_SingleMuon_histfile.root files_initial/2017B_SingleMuon.root data_obs data_obs 0
 
 #./postAnalyzer.exe /data/strembat/WZtest17/WZsignal17skim.root files_initial/WZTo3LNu.root WZTo3LNu WZ 0
 
@@ -17,7 +21,7 @@ hadd -f f_initial.root files_initial/*.root
 
 echo "*************** root file made ***************"
 
-#sh do_plots.sh
+sh do_plots.sh
 #python makeplot.py Cutflow _ events eachlevel -logYaxis logy
 #python makeplot.py Events_level_ _ events eachlevel -logYaxis logy
 #python makeplot.py MET _0  MET '_' -logYaxis logy

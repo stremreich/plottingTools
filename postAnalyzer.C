@@ -53,9 +53,13 @@ Double_t Luminosity = 41521.0;//Lumi for inclusive
 TString channels[4] = {"eee", "eem", "emm", "mmm"};
 
 string plotVars[] = {"Energy",
-			"Eta",
-			"Phi",
-			"Pt"};
+		     "Eta",
+		     "Phi",
+		     "Pt",
+		     "Mass",
+		     "etajj",
+		     "mjj",
+		     "nJets"};
 
 int varsSize = sizeof(plotVars) / sizeof(plotVars[0]);
 
@@ -67,8 +71,6 @@ void make_hist(string input_file, string output_file, string histname_string, st
   TString input_name = TString(input_file);
   TString output_name = TString(output_file); 
   TString name = TString(name_);
-  
-  cout << "test flag 3\n";
   
   // Double_t Luminosity = 44980.0;
 
@@ -86,10 +88,20 @@ void make_hist(string input_file, string output_file, string histname_string, st
   TFile* outputFile;
   // cout<<"1. updating file for "<< histname<<endl;
 
-  outputFile = new TFile(output_name, "UPDATE");
-  //outputFile->cd(histname);
+  outputFile = new TFile(output_name, "UPDATE");  //outputFile->cd(histname);
 
-  cout << "test flag 4\n";
+  TH1F* evt_counter_eee = (TH1F*) file_input->Get("eee/Energy");
+  TH1F* evt_counter_eem = (TH1F*) file_input->Get("eem/Energy");
+  TH1F* evt_counter_emm = (TH1F*) file_input->Get("emm/Energy");
+  TH1F* evt_counter_mmm = (TH1F*) file_input->Get("mmm/Energy");
+
+  Double_t nevt_eee = evt_counter_eee->GetEntries();
+  Double_t nevt_eem = evt_counter_eem->GetEntries();
+  Double_t nevt_emm = evt_counter_emm->GetEntries();
+  Double_t nevt_mmm = evt_counter_mmm->GetEntries();
+
+  Double_t nevt[4] = {nevt_eee, nevt_eem, nevt_emm, nevt_mmm};
+  
   
   if(histname == "Events_level_"){
     TH1F* histo_events_level = (TH1F*)((TH1F*)file_input->Get("Events_level"))->Clone(TString(name+"_"+histname));
@@ -115,18 +127,14 @@ void make_hist(string input_file, string output_file, string histname_string, st
     for (int i = 0; i < 4; ++i) {
       TString dirHist = channels[i] + "/" + histname;
       TH1F* histo = (TH1F*)((TH1F*)file_input->Get(dirHist))->Clone(TString(name+"_"+histname));
-
-      cout << "test flag 5\n";
       
       if(sample=="data_obs"){ net_weight = 1.0;  }
+      net_weight = xsec+Luminosity/nevt[i];
       histo->Scale(net_weight);
-
-      cout << "test flag 6\n";
     
       outputFile->cd(channels[i] + "/" + histname_string);
       histo->Write();
 
-      cout << "test flag 7\n";
     }
     
     //histo_1->Write();
@@ -183,8 +191,6 @@ void make_hist(string input_file, string output_file, string histname_string, st
 
   outputFile->Close();
 
-  cout << "test flag 8\n";
-
 }
 
 
@@ -213,7 +219,6 @@ int main(int argc, char** argv)
   cout<<"XXXXXXXXXXXXX "<<output.c_str()<<"XXXXXXXXXXXXX "<<endl;
   cout<<"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX "<<endl;
   
-  //TH1F* nbevt = (TH1F*) f_Double->Get("Events_level" );
   //TH1F* nbevt = (TH1F*) f_Double->Get("MET_0" );
 
   //TTree *arbre = (TTree*) f_Double->Get("/ggNtuplizer/EventTree");
@@ -236,7 +241,17 @@ int main(int argc, char** argv)
   Double_t xs=1.0; Double_t weight=1.0; Double_t luminosity=Luminosity;
   Double_t LOtoNNLO_DY = 1.0;//5765.4/4954.0;
   Double_t LOtoNNLO_Wjets = 1.0;// 61526.7/50380; 
-  if (sample=="ZL" or sample=="ZTT" or sample=="ZJ" or sample=="ZLL"){ xs=LOtoNNLO_DY*4954.0; weight=luminosity*xs/ngen;}
+  if (sample=="data_obs") {weight=1.0;}
+  
+  else if (sample=="WZTo3LNu_0Jets") {xs=0.5771*1.206; weight=luminosity*xs/ngen;}
+  else if (sample=="WZTo3LNu_1Jets") {xs=0.3446*1.206; weight=luminosity*xs/ngen;}
+  else if (sample=="WZTo3LNu_2Jets") {xs=0.0786*1.206; weight=luminosity*xs/ngen;}
+  else if (sample=="WZTo3LNu_3Jets") {xs=0.1112*1.206; weight=luminosity*xs/ngen;}
+  else if (sample=="WZTo3LNu") {xs=4.42965*1.109; weight=luminosity*xs/ngen;}
+  /*
+
+  else if (sample=="ZL" or sample=="ZTT" or sample=="ZJ" or sample=="ZLL"){ xs=LOtoNNLO_DY*4954.0; weight=luminosity*xs/ngen;}
+  
   else if (sample=="ZTT1"){ xs=LOtoNNLO_DY*1012.5; weight=luminosity*xs/ngen;}
   else if (sample=="ZTT2"){ xs=LOtoNNLO_DY*332.8; weight=luminosity*xs/ngen;}
   else if (sample=="ZTT3"){ xs=LOtoNNLO_DY*101.8; weight=luminosity*xs/ngen;}
@@ -265,7 +280,7 @@ int main(int argc, char** argv)
   else if (sample=="VBFHToWWTo2L2Nu") {xs=0.0858; weight=luminosity*xs/ngen;}
 
   else if (sample=="QCD") {xs=720648000*0.00042; weight=luminosity*xs/ngen;}
-  else if (sample=="data_obs"){weight=1.0;}
+  else if (sample=="WZTo3LNu") {xs=0.5771*1.206; weight=luminosity*xs/ngen;}else if (sample=="data_obs"){weight=1.0;}
 
 
   else if (sample=="dataset_1"){weight=1.0;}
@@ -286,7 +301,7 @@ int main(int argc, char** argv)
   else if (sample=="WZTo1L3Nu") {xs=3.05; weight=luminosity*xs/ngen;}
   else if (sample=="WZTo1L1Nu2Q") {xs=10.71; weight=luminosity*xs/ngen;}
   else if (sample=="WZTo2L2Q") {xs=5.595; weight=luminosity*xs/ngen;}
-  else if (sample=="WZTo3LNu") {xs=4.43; weight=luminosity*xs/ngen;}
+  else if (sample=="WZTo3LNu") {xs=0.5771*1.206; weight=luminosity*xs/ngen;}
   
   else if (sample=="ST_tW_antitop") {xs=35.6; weight=luminosity*xs/ngen;}
   else if (sample=="ST_tW_top") {xs=35.6; weight=luminosity*xs/ngen;}
@@ -342,6 +357,7 @@ int main(int argc, char** argv)
   else if (sample=="EWKWPlus" or sample=="EWKWPlus2Jets") {xs=25.62; weight=luminosity*xs/ngen;}
   else if (sample=="EWKZLL" or sample=="EWKZ2Jets_ZToLL" or sample=="EWKZLL_TT" or sample=="EWKZLL_J" or sample=="EWKZLL_L" or sample=="EWKZLL_LL") {xs=3.987; weight=luminosity*xs/ngen;}
   else if (sample=="EWKZNuNu" or sample=="EWKZ2Jets_ZToNuNu" or sample=="EWKZNuNu_TT" or sample=="EWKZNuNu_J" or sample=="EWKZNuNu_L" or sample=="EWKZNuNu_LL") {xs=10.01; weight=luminosity*xs/ngen;}
+  */
   else {
     cout<<"Attention!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<endl;
     cout<<"***********                                  *****************"<<endl;
@@ -365,7 +381,6 @@ int main(int argc, char** argv)
   std::vector<TString> plotnames;
   plotnames.clear();
 
-  cout << "test flag 1\n";
 
 //  histnames.push_back(TString("_4"));
 //  leg_xoffsets.push_back(0.);
@@ -378,8 +393,6 @@ int main(int argc, char** argv)
   leg_yoffsets.push_back(0.);
   xaxis_titles.push_back(TString("Energy [GeV]"));
   plotnames.push_back(TString("Energy"));
-
-  cout << "test flag 2\n";
 
   /*
   
